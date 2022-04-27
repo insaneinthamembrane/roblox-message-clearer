@@ -7,4 +7,4 @@ archives all messages
 ```bash
 pip install -r requirements.txt
 ```
-after installing the requirements, put your cookie in the text file and run "run.bat"
+put your cookie in the text file

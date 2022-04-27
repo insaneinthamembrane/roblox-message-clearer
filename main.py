@@ -1,12 +1,12 @@
-# std
-from asyncio import gather, get_event_loop
-# 3rd
-from httpx import AsyncClient
+import asyncio
+import httpx
 
 with open('cookie.txt', encoding='utf-8') as f:
     cookie = f.read()
 
-client = AsyncClient(cookies={'.ROBLOSECURITY': cookie})
+client = httpx.AsyncClient(
+    cookies={'.ROBLOSECURITY': cookie}
+)
 
 MESSAGES = 'https://privatemessages.roblox.com/v1/messages'
 
@@ -20,7 +20,7 @@ async def clear_page(page_number):
     req = await client.get(f'{MESSAGES}?pageNumber={page_number}&pageSize=20&messageTab=Inbox')
     res = req.json()
 
-    msg_ids = [i.get('id') for i in res.get('collection')]
+    msg_ids = [i['id'] for i in res['collection']]
     await client.post(
         'https://privatemessages.roblox.com/v1/messages/archive',
         data={"messageIds": msg_ids},
@@ -34,9 +34,8 @@ async def main():
     if not pages:
         return
 
-    await gather(
+    await asyncio.gather(
         *(clear_page(i) for i in range(pages))
     )
 
-get_event_loop().run_until_complete(main())
-input('Completed. Press any key to exit')
+asyncio.get_event_loop().run_until_complete(main())
