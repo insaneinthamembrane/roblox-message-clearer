@@ -38,4 +38,4 @@ async def main():
         *(clear_page(i) for i in range(pages))
     )
 
-asyncio.get_event_loop().run_until_complete(main())
+asyncio.run(main())
