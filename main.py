@@ -4,8 +4,10 @@ import httpx
 with open('cookie.txt', encoding='utf-8') as f:
     cookie = f.read()
 
+limits=httpx.Limits(max_connections=10)
 client = httpx.AsyncClient(
-    cookies={'.ROBLOSECURITY': cookie}
+    cookies={'.ROBLOSECURITY': cookie},
+    limits=limits
 )
 
 MESSAGES = 'https://privatemessages.roblox.com/v1/messages'
