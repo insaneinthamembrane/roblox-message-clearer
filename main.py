@@ -32,12 +32,11 @@ async def clear_page(page_number):
 async def main():
     req = await client.get(f'{MESSAGES}?pageNumber=1&pageSize=20&messageTab=Inbox')
     res = req.json()
-    pages = res.get('totalPages', None)
-    if not pages:
+    if pages := res.get('totalPages', None):
+        await asyncio.gather(
+            *(clear_page(i) for i in range(pages))
+        )
+    else:
         return
-
-    await asyncio.gather(
-        *(clear_page(i) for i in range(pages))
-    )
 
 asyncio.run(main())
