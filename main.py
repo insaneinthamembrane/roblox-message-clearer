@@ -1,16 +1,15 @@
 import asyncio
+import pathlib
+
 import httpx
 
-with open('cookie.txt', encoding='utf-8') as f:
-    cookie = f.read()
+cookie = pathlib.Path('cookie.txt').read_text()
 
-limits=httpx.Limits(max_connections=10)
+limits = httpx.Limits(max_connections=10)
 client = httpx.AsyncClient(
     cookies={'.ROBLOSECURITY': cookie},
     limits=limits
 )
-
-MESSAGES = 'https://privatemessages.roblox.com/v1/messages'
 
 
 async def fetch_csrf():
@@ -19,10 +18,10 @@ async def fetch_csrf():
 
 
 async def clear_page(page_number):
-    req = await client.get(f'{MESSAGES}?pageNumber={page_number}&pageSize=20&messageTab=Inbox')
+    req = await client.get(f'https://privatemessages.roblox.com/v1/messages?pageNumber={page_number}&pageSize=20&messageTab=Inbox')
     res = req.json()
 
-    msg_ids = [i['id'] for i in res['collection']]
+    msg_ids = [i.get('id') for i in res.get('collection', [])]
     await client.post(
         'https://privatemessages.roblox.com/v1/messages/archive',
         data={"messageIds": msg_ids},
@@ -30,14 +29,12 @@ async def clear_page(page_number):
 
 
 async def main():
-    req = await client.get(f'{MESSAGES}?pageNumber=1&pageSize=20&messageTab=Inbox')
+    req = await client.get('https://privatemessages.roblox.com/v1/messages?pageNumber=1&pageSize=20&messageTab=Inbox')
     res = req.json()
-    pages = res.get('totalPages', None)
-    if not pages:
-        return
 
-    await asyncio.gather(
-        *(clear_page(i) for i in range(pages))
-    )
+    if pages := res.get('totalPages', None):
+        await asyncio.gather(
+            *(clear_page(i) for i in range(pages))
+        )
 
 asyncio.run(main())

@@ -2,9 +2,8 @@
 
 archives all messages
 
-## Installation / Usage
+## Installing Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
-put your cookie in the text file
